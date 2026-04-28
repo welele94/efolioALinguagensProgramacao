@@ -1,0 +1,5 @@
+main.exe
+ocaml/*.cmi
+ocaml/*.cmo
+java/bin/
+boletins/
