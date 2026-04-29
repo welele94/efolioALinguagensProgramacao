@@ -6,13 +6,16 @@ import java.io.OutputStreamWriter;
 
 public class Boletim {
     public void gravar(int alunoId, String indicadores, String avaliacao) throws IOException {
+        // Garante que a pasta de saida existe antes de escrever o ficheiro
         File pasta = prepararPastaBoletins();
         File ficheiro = new File(pasta, "aluno_" + alunoId + ".json");
 
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(ficheiro), "UTF-8"));
         try {
+            // Extrai os dados relevantes das strings devolvidas pelo OCaml
             DadosBoletim dados = extrairDados(alunoId, indicadores, avaliacao);
 
+            // Escrita manual do JSON (sem bibliotecas externas)
             writer.write("{\n");
             writer.write("  \"alunoId\": " + alunoId + ",\n");
             writer.write("  \"indicadores\": {\n");
@@ -37,6 +40,7 @@ public class Boletim {
     }
 
     public void gravarCSV(int alunoId, String indicadores, String avaliacao) throws IOException {
+        // Exportacao alternativa para CSV (mais facil de abrir no Excel)
         File pasta = prepararPastaBoletins();
         File ficheiro = new File(pasta, "aluno_" + alunoId + ".csv");
 
@@ -44,7 +48,10 @@ public class Boletim {
         try {
             DadosBoletim dados = extrairDados(alunoId, indicadores, avaliacao);
 
+            // Cabecalho do ficheiro CSV
             writer.write("alunoId,participacoesForum,mediaTarefas,mediaQuizzes,mediaConjunta,assiduidade,autoavaliacao,R1,R2,R3,R4,estadoFinal\n");
+
+            // Linha de dados
             writer.write(alunoId + ","
                 + dados.participacoesForum + ","
                 + dados.mediaTarefas + ","
@@ -71,6 +78,7 @@ public class Boletim {
     }
 
     private DadosBoletim extrairDados(int alunoId, String indicadores, String avaliacao) throws IOException {
+        // Procura a linha correta correspondente ao aluno dentro do output do OCaml
         String linhaIndicadores = encontrarLinhaDoAluno(alunoId, indicadores);
         String[] partes = linhaIndicadores.split(";");
 
@@ -86,6 +94,7 @@ public class Boletim {
         dados.assiduidade = partes[5].trim();
         dados.autoavaliacao = partes[6].trim();
 
+        // Interpretacao das regras a partir do texto devolvido pelo OCaml
         dados.r1 = avaliacao.contains("R1") && avaliacao.contains("R1 (>=3 forum): true");
         dados.r2 = avaliacao.contains("R2") && avaliacao.contains("R2 (media >=10): true");
         dados.r3 = avaliacao.contains("R3") && avaliacao.contains("R3 (assid. >=75%): true");
@@ -107,6 +116,7 @@ public class Boletim {
     }
 
     private String extrairEstadoFinal(String avaliacao) {
+        // Identifica o estado final com base no texto
         if (avaliacao.contains("Estado final: Aprovado")) {
             return "Aprovado";
         }
