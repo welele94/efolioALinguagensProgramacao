@@ -23,9 +23,11 @@ public class Menu {
                     imprimir(integrador.executar("listar_alunos"));
                 } else if ("2".equals(opcao)) {
                     int id = lerId();
+                    if (id == -1) continue;
                     imprimir(integrador.executar("indicadores", String.valueOf(id)));
                 } else if ("3".equals(opcao)) {
                     int id = lerId();
+                    if (id == -1) continue;
                     imprimir(integrador.executar("avaliar", String.valueOf(id)));
                 } else if ("4".equals(opcao)) {
                     imprimir(integrador.executar("listar_estados"));
@@ -39,7 +41,7 @@ public class Menu {
                     System.out.println("Opcao invalida.");
                 }
             } catch (Exception e) {
-                System.out.println("Erro: " + e.getMessage());
+                System.out.println("Erro ao executar operacao. Verifique o ID ou tente novamente.");
             }
         }
     }
@@ -60,20 +62,44 @@ public class Menu {
     private int lerId() {
         System.out.print("ID do aluno: ");
         String texto = scanner.nextLine().trim();
-        return Integer.parseInt(texto);
+
+        try {
+            int id = Integer.parseInt(texto);
+            if (id <= 0) {
+                System.out.println("ID invalido.");
+                return -1;
+            }
+            return id;
+        } catch (NumberFormatException e) {
+            System.out.println("ID invalido.");
+            return -1;
+        }
+    }
+
+    private String[] obterDadosAluno(int id) throws IOException, InterruptedException {
+        String indicadores = integrador.executar("indicadores", String.valueOf(id));
+        String avaliacao = integrador.executar("avaliar", String.valueOf(id));
+        return new String[]{indicadores, avaliacao};
     }
 
     private void emitirBoletim() throws IOException, InterruptedException {
         int id = lerId();
-        String indicadores = integrador.executar("indicadores", String.valueOf(id));
-        String avaliacao = integrador.executar("avaliar", String.valueOf(id));
+        if (id == -1) return;
+
+        String[] dados = obterDadosAluno(id);
+        String indicadores = dados[0];
+        String avaliacao = dados[1];
 
         boletim.gravar(id, indicadores, avaliacao);
-        System.out.println("--- Indicadores ---");
-        System.out.print(indicadores);
-        System.out.println("--- Avaliacao ---");
-        System.out.print(avaliacao);
-        System.out.println("Boletim gravado em boletins/aluno_" + id + ".json");
+        System.out.println("Boletim JSON gravado em boletins/aluno_" + id + ".json");
+
+        System.out.print("Exportar tambem para CSV? (s/n): ");
+        String resposta = scanner.nextLine().trim();
+
+        if (resposta.equalsIgnoreCase("s")) {
+            boletim.gravarCSV(id, indicadores, avaliacao);
+            System.out.println("Boletim CSV gravado em boletins/aluno_" + id + ".csv");
+        }
     }
 
     private void imprimir(String texto) {
