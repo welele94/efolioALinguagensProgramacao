@@ -1,56 +1,93 @@
-e-Folio A - Linguagens de Programacao
-=====================================
+# e-Fólio A — Linguagens de Programação (OCaml + Java)
 
-Estrutura
----------
-database/database.pl       Base de dados em formato Prolog.
-ocaml/main.ml              Programa principal OCaml.
-java/src/                  Interface Java organizada por classes.
-relatorio/relatorio.md     Base para o relatorio final.
+## Descrição
 
-Compilacao
-----------
+Este projeto implementa um sistema de acompanhamento de alunos, que analisa a
+participação, desempenho e assiduidade ao longo do semestre.
+
+Os dados são lidos a partir de um ficheiro em formato Prolog (`database.pl`) e
+processados em OCaml. A aplicação Java funciona como interface, permitindo
+executar os comandos de forma interativa.
+
+---
+
+## Estrutura do Projeto
+
+database/database.pl
+Base de dados com informação dos alunos.
+
+ocaml/main.ml
+Programa principal em OCaml (responsável pelo processamento).
+
+java/src/
+Código da interface Java:
+
+* Aplicacao.java — ponto de entrada
+* Menu.java — menu interativo
+* IntegradorOCaml.java — ligação ao executável OCaml
+* Boletim.java — geração de ficheiros JSON e CSV
+
+relatorio/
+Contém o relatório do trabalho.
+
+---
+
+## Requisitos
+
+* OCaml instalado
+* Java (JDK 8 ou superior)
+
+---
+
+## Compilação
+
 1. Compilar o programa OCaml:
    ocamlc str.cma -o main.exe ocaml/main.ml
 
-2. Compilar a interface Java:
+2. Compilar a aplicação Java:
    mkdir -p java/bin
    javac -encoding UTF-8 -d java/bin java/src/*.java
 
-Tambem pode usar:
-   make
+---
 
-Execucao OCaml
---------------
-Listar alunos:
-   ./main.exe listar_alunos
+## Execução
 
-Calcular indicadores de um aluno:
-   ./main.exe indicadores 1
+Executar comandos diretamente em OCaml:
 
-Avaliar um aluno:
-   ./main.exe avaliar 2
+./main.exe listar_alunos
+./main.exe indicadores 1
+./main.exe avaliar 2
+./main.exe listar_estados
+./main.exe listar_auto_coerente
 
-Listar estados finais:
-   ./main.exe listar_estados
+Executar a interface Java:
 
-Opcao bonus:
-   ./main.exe listar_auto_coerente
+java -cp java/bin Aplicacao ./main.exe
 
-Execucao Java
-------------
-Depois de compilar OCaml e Java:
-   java -cp java/bin Aplicacao
+---
 
-Se o executavel OCaml estiver noutro caminho:
-   java -cp java/bin Aplicacao /caminho/para/main.exe
+## Boletins
 
-Boletins
---------
-A opcao "Emitir boletim JSON" cria ficheiros na pasta boletins, por exemplo:
-   boletins/aluno_1.json
+A opção "Emitir boletim" permite gerar ficheiros com os resultados do aluno:
 
-Notas
------
-O ficheiro database/database.pl deve existir quando o programa e executado, porque o caminho
-esta definido no programa OCaml como database/database.pl.
+* JSON:
+  boletins/aluno_1.json
+
+* CSV (funcionalidade extra):
+  boletins/aluno_1.csv
+
+---
+
+## Funcionalidade Extra
+
+Para além do formato JSON pedido no enunciado, foi adicionada a possibilidade de
+exportar os dados em formato CSV, permitindo abrir e analisar facilmente os
+resultados em ferramentas como Excel.
+
+---
+
+## Notas
+
+* Os comandos devem ser executados a partir da raiz do projeto.
+* O ficheiro `database/database.pl` deve existir no caminho definido.
+* A pasta `boletins/` é criada automaticamente quando necessário.
